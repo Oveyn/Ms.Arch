@@ -1,0 +1,91 @@
+{
+	"info": {
+		"_postman_id": "703e6bd8-bdf0-4213-9b67-28e076d4b781",
+		"name": "Ms.Arch.Hw01",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Hello",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_hw01}}/",
+					"host": [
+						"{{host_hw01}}"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Version",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host-hw01}}/version",
+					"host": [
+						"{{host-hw01}}"
+					],
+					"path": [
+						"version"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RewriteUrl",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_hw01}}/otusapp/Oveyn/",
+					"host": [
+						"{{host_hw01}}"
+					],
+					"path": [
+						"otusapp",
+						"Oveyn",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.test(\"test-hw01\", function ()",
+					"{",
+					"    pm.response.to.have.status(200);",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host_hw01",
+			"value": "http://arch.homework"
+		}
+	]
+}

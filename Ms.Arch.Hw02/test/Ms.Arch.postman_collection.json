@@ -1,0 +1,186 @@
+{
+	"info": {
+		"_postman_id": "002b4cd1-df7d-4f31-b14a-b46a3bb06262",
+		"name": "Ms.Arch.Hw02",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Users API",
+			"item": [
+				{
+					"name": "Add a new User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonObj = JSON.parse(responseBody)\r",
+									"pm.collectionVariables.set(\"user_id\", jsonObj.id)\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"Vasya\",\r\n  \"lastName\": \"Ivanov\",\r\n  \"email\": \"vIvanov@gmail.com\",\r\n  \"phone\": \"123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_hw02}}/users",
+							"host": [
+								"{{host_hw02}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_hw02}}/users",
+							"host": [
+								"{{host_hw02}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_hw02}}/users/{{user_id}}",
+							"host": [
+								"{{host_hw02}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update an existing User",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\":{{user_id}},\r\n  \"firstName\": \"VasyaUpd\",\r\n  \"lastName\": \"IvanovUpd\",\r\n  \"email\": \"vIvanov@gmail.com\",\r\n  \"phone\": \"12345\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_hw02}}/users/{{user_id}}",
+							"host": [
+								"{{host_hw02}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete an existing User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_hw02}}/users/{{user_id}}",
+							"host": [
+								"{{host_hw02}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host_hw02",
+			"value": "http://arch.homework"
+		},
+		{
+			"key": "user_id",
+			"value": ""
+		}
+	]
+}

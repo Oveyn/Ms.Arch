@@ -1,0 +1,208 @@
+## @section PostgreSQL parameters
+
+## Bitnami PostgreSQL image version
+## ref: https://hub.docker.com/r/bitnami/postgresql/tags/
+## @param image.registry PostgreSQL image registry
+## @param image.repository PostgreSQL image repository
+## @param image.tag PostgreSQL image tag (immutable tags are recommended)
+## @param image.pullPolicy PostgreSQL image pull policy
+## @param image.pullSecrets Specify image pull secrets
+## @param image.debug Specify if debug values should be set
+##
+image:
+  registry: docker.io
+  repository: bitnami/postgresql
+  tag: 11.14.0-debian-10-r17
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+
+## Init containers parameters:
+## volumePermissions: Change the owner of the persist volume mountpoint to RunAsUser:fsGroup
+##
+volumePermissions:
+  enabled: false
+  
+## Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
+securityContext:
+  enabled: true
+  fsGroup: 1001  
+
+## @param postgresqlPostgresPassword PostgreSQL admin password (used when `postgresqlUsername` is not `postgres`, in which case`postgres` is the admin username)
+## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#creating-a-database-user-on-first-run (see note!)
+postgresqlPostgresPassword: "sudopasswd"
+## @param postgresqlUsername PostgreSQL user (has superuser privileges if username is `postgres`)
+## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#setting-the-root-password-on-first-run
+##
+postgresqlUsername: myuser
+## @param postgresqlPassword PostgreSQL user password
+## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#setting-the-root-password-on-first-run
+##
+postgresqlPassword: "passwd"
+
+## @param usePasswordFile Mount PostgreSQL secret as a file instead of passing environment variable
+##
+usePasswordFile: false
+## @param postgresqlDatabase PostgreSQL database
+## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#creating-a-database-on-first-run
+##
+postgresqlDatabase: "myapp-db"
+## @param postgresqlDataDir PostgreSQL data dir folder
+## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md
+##
+postgresqlDataDir: /bitnami/postgresql/data
+
+## PostgreSQL service configuration
+##
+service:
+  ## @param service.type Kubernetes Service type
+  ##
+  type: ClusterIP
+  ## @param service.port PostgreSQL port
+  ##
+  port: 5432
+
+  ## @param service.externalTrafficPolicy Enable client source IP preservation
+  ## ref https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  ##
+  externalTrafficPolicy: Cluster
+
+persistence:
+  ## @param persistence.enabled Enable persistence using PVC
+  ##
+  enabled: true
+  ## @param persistence.mountPath The path the volume will be mounted at, useful when using different
+  ## PostgreSQL images.
+  ##
+  mountPath: /bitnami/postgresql
+  ## @param persistence.accessModes PVC Access Mode for PostgreSQL volume
+  ##
+  accessModes:
+    - ReadWriteOnce
+  ## @param persistence.size PVC Storage Request for PostgreSQL volume
+  ##
+  size: 512Mi
+
+## @param updateStrategy.type updateStrategy for PostgreSQL StatefulSet and its reads StatefulSets
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+##
+updateStrategy:
+  type: RollingUpdate
+## Configure resource requests and limits
+## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+## @param resources.requests [object] The requested resources for the container
+##
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 250m
+
+## Configure extra options for liveness probe
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+## @param livenessProbe.enabled Enable livenessProbe
+## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+## @param livenessProbe.periodSeconds Period seconds for livenessProbe
+## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
+## @param livenessProbe.successThreshold Success threshold for livenessProbe
+##
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+## Configure extra options for readiness probe
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+## @param readinessProbe.enabled Enable readinessProbe
+## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+## @param readinessProbe.periodSeconds Period seconds for readinessProbe
+## @param readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+## @param readinessProbe.failureThreshold Failure threshold for readinessProbe
+## @param readinessProbe.successThreshold Success threshold for readinessProbe
+##
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+## Configure metrics exporter
+##
+metrics:
+  ## @param metrics.enabled Start a prometheus exporter
+  ##
+  enabled: true
+  ## @param metrics.service.type Kubernetes Service type
+  ## @param metrics.service.annotations [object] Additional annotations for metrics exporter pod
+  ## @param metrics.service.loadBalancerIP loadBalancerIP if redis metrics service type is `LoadBalancer`
+  ##
+  service:
+    type: ClusterIP
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "9187"
+    loadBalancerIP: ""
+  ## @param metrics.serviceMonitor.enabled Set this to `true` to create ServiceMonitor for Prometheus operator
+  ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor will be discovered by Prometheus
+  ## @param metrics.serviceMonitor.namespace Optional namespace in which to create ServiceMonitor
+  ## @param metrics.serviceMonitor.interval Scrape interval. If not set, the Prometheus default scrape interval is used
+  ## @param metrics.serviceMonitor.scrapeTimeout Scrape timeout. If not set, the Prometheus default scrape timeout is used
+  ## @param metrics.serviceMonitor.relabelings RelabelConfigs to apply to samples before scraping
+  ## @param metrics.serviceMonitor.metricRelabelings MetricRelabelConfigs to apply to samples before ingestion
+  ##
+  serviceMonitor:
+    enabled: true
+    additionalLabels: {}
+
+  ## @param metrics.image.registry PostgreSQL Exporter image registry
+  ## @param metrics.image.repository PostgreSQL Exporter image repository
+  ## @param metrics.image.tag PostgreSQL Exporter image tag (immutable tags are recommended)
+  ## @param metrics.image.pullPolicy PostgreSQL Exporter image pull policy
+  ## @param metrics.image.pullSecrets Specify image pull secrets
+  ##
+  image:
+    registry: docker.io
+    repository: bitnami/postgres-exporter
+    tag: 0.10.0-debian-10-r133
+    pullPolicy: IfNotPresent
+
+  ## Configure extra options for liveness probe
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param metrics.livenessProbe.enabled Enable livenessProbe
+  ## @param metrics.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param metrics.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param metrics.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param metrics.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param metrics.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  ## Configure extra options for readiness probe
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param metrics.readinessProbe.enabled Enable readinessProbe
+  ## @param metrics.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param metrics.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param metrics.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param metrics.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param metrics.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "hw-02-chart.fullname" . }}
+  labels:
+    {{- include "hw-02-chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "hw-02-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "hw-02-chart.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /liveness
+              port: http
+            initialDelaySeconds: {{.Values.livenessProbe.initialDelaySeconds}}
+            periodSeconds: {{.Values.livenessProbe.periodSeconds}}
+            timeoutSeconds: {{.Values.livenessProbe.timeoutSeconds}}
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: http
+            initialDelaySeconds: {{.Values.readinessProbe.initialDelaySeconds}}
+            periodSeconds: {{.Values.readinessProbe.periodSeconds}}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: PostgresDbConnect
+              valueFrom:
+                #configMapKeyRef:
+                #    name: ms-arch-hw02-config
+                #    key: PostgresDbConnect
+                secretKeyRef:
+                    name: ms-arch-hw02-secret
+                    key: PostgresDbConnect

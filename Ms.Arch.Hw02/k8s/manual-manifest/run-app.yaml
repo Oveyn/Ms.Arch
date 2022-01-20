@@ -1,0 +1,120 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ms-arch-hw02
+
+---
+#ConfigMap
+
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#    name: ms-arch-hw02-config
+#    namespace: ms-arch-hw02
+#data:
+#   PostgresDbConnect: Username=myuser;Password=passwd;Host=postgres-s-postgresql;Port=5432;Database=myapp-db;Pooling=True;Minimum Pool Size=3;Maximum Pool Size=25;Timeout=5;
+
+#Secrets
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+    name: ms-arch-hw02-secret
+    namespace: ms-arch-hw02
+data:
+    PostgresDbConnect: VXNlcm5hbWU9bXl1c2VyO1Bhc3N3b3JkPXBhc3N3ZDtIb3N0PXBvc3RncmVzLXMtcG9zdGdyZXNxbDtQb3J0PTU0MzI7RGF0YWJhc2U9bXlhcHAtZGI7UG9vbGluZz1UcnVlO01pbmltdW0gUG9vbCBTaXplPTM7TWF4aW11bSBQb29sIFNpemU9MjU7VGltZW91dD01Ow==
+    
+
+---
+#Deployment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: ms-hw02-d
+    namespace: ms-arch-hw02
+spec:
+    selector:
+        matchLabels:
+            app: ms-hw02-app
+    replicas: 2
+    strategy:
+        type: RollingUpdate
+        rollingUpdate:
+            maxSurge: 1
+            maxUnavailable: 0
+    template:
+        metadata:
+            labels:
+                app: ms-hw02-app
+        spec:
+            containers:
+            - image: ms-arch-hw02-api:1.0.0
+              name: ms-hw02
+              env:
+                - name: PostgresDbConnect
+                  valueFrom:
+                    #configMapKeyRef:
+                    #    name: ms-arch-hw02-config
+                    #    key: PostgresDbConnect
+                    secretKeyRef:
+                        name: ms-arch-hw02-secret
+                        key: PostgresDbConnect
+              ports:
+                - name: web
+                  containerPort: 5000
+              livenessProbe:
+                httpGet:
+                    port: web
+                    path: /liveness
+                initialDelaySeconds: 10
+                periodSeconds: 15
+                timeoutSeconds: 1
+              readinessProbe:
+                httpGet:
+                    port: web
+                    path: /readiness
+                initialDelaySeconds: 10
+                periodSeconds: 5
+
+
+---
+#Service
+
+apiVersion: v1
+kind: Service
+metadata:
+    name: ms-hw02-s
+    namespace: ms-arch-hw02
+spec:
+    type: ClusterIP
+    selector:
+        app: ms-hw02-app
+    ports:
+        - port: 8000
+          targetPort: web
+
+---
+#Ingress
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: ms-hw02-i
+    namespace: ms-arch-hw02
+    annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/configuration-snippet: |-
+            rewrite ^/otusapp/Oveyn/(.*) /$1 last;
+spec:
+    rules:
+    - host: arch.homework
+      http:
+        paths:
+          - backend:
+                service:
+                    name: ms-hw02-s
+                    port:
+                        number: 8000
+            path: /
+            pathType: Prefix
