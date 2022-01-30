@@ -1,8 +1,10 @@
 ﻿using FluentMigrator;
+using JetBrains.Annotations;
 
 namespace Ms.Arch.Hw02.Api.Persistence.Migrations
 {
     [Migration(202110262001, "CreateTableUserAccount")]
+    [UsedImplicitly]
     public class _202110262001_CreateUserTable : AutoReversingMigration
     {
         public override void Up()

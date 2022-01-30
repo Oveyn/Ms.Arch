@@ -12,6 +12,7 @@ using Ms.Arch.Hw02.Api.Application.Services;
 using Ms.Arch.Hw02.Api.CommonCore;
 using Ms.Arch.Hw02.Api.CommonCore.CommonMiddleware;
 using Ms.Arch.Hw02.Api.CommonCore.HealthCheck;
+using Ms.Arch.Hw02.Api.CommonCore.Metrics;
 using Ms.Arch.Hw02.Api.CommonCore.VersionsInfo;
 using Ms.Arch.Hw02.Api.Persistence;
 
@@ -30,6 +31,7 @@ namespace Ms.Arch.Hw02.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCommonPrometheus();
             SetCommonServiceData(HostEnvironment);
 
             services.AddControllers();
@@ -82,11 +84,12 @@ namespace Ms.Arch.Hw02.Api
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Arch.Hw02 v1"));
 
-            app.UseMiddleware<CommonRequestResponseLoggingMiddleware>();
             app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseRouting();
             app.UseCommonHealthCheck();
             app.UseCommonVersion();
+            app.UseCommonMetrics();
+            app.UseMiddleware<CommonRequestResponseLoggingMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

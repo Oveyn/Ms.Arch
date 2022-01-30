@@ -1,5 +1,6 @@
 using System.Net.Mime;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 using Ms.Arch.Hw02.Api.CommonCore.VersionsInfo;
 
@@ -9,8 +10,10 @@ namespace Ms.Arch.Hw02.Api.CommonCore.CommonMiddleware
     {
         public CommonVersionMiddleware(RequestDelegate next)
         {
+            //ignore
         }
 
+        [UsedImplicitly]
         public async Task Invoke(HttpContext context)
         {
             var response = new CommonVersionResponse

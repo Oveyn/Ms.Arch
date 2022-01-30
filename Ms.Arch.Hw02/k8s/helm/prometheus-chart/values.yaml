@@ -1,0 +1,15 @@
+prometheus:
+  prometheusSpec:
+    # Use all prometheus rules on the cluster
+    ruleNamespaceSelector: {}
+    ruleSelectorNilUsesHelmValues: false
+    serviceMonitorSelector: {}
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorNamespaceSelector: {}
+    
+grafana:
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana-dashboards-app
+      

@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: ingress-nginx
+  name: ingress-nginx-metrics
+  labels:
+    component: ingress-nginx-metrics
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 10254
+    protocol: TCP
+  selector:
+      app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/component: controller
+      
+---
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  namespace: ingress-nginx
+  name: ingress-nginx-metrics
+  labels:
+    component: ingress-nginx-metrics
+spec:
+  selector:
+    matchLabels:
+      component: ingress-nginx-metrics
+  namespaceSelector:
+    matchNames:
+    - ingress-nginx
+  endpoints:
+    - interval: 5s
+      port: http
+      path: metrics

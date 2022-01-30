@@ -90,12 +90,12 @@ namespace Ms.Arch.Hw02.Api.CommonCore.CommonMiddleware
             return result;
         }
 
-        private async Task<string> GetResponseBody(HttpContext context)
+        private static async Task<string> GetResponseBody(HttpContext context)
         {
             return await PrepareResponseMessage(context.Response);
         }
 
-        private async Task<string> PrepareResponseMessage(
+        private static async Task<string> PrepareResponseMessage(
             HttpResponse response)
         {
             response.Body.Seek(0, SeekOrigin.Begin);
