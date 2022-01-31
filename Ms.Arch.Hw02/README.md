@@ -33,7 +33,7 @@ newman run test/Ms.Arch.postman_collection.json
 ```
 #load test
 ```console
-ab -t 30 -c 5 http://arch.homework/users
+ab -t 60 -c 3 http://arch.homework/users
 ```
 
 #Watch Grafana
