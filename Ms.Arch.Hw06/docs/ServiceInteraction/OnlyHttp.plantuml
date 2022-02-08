@@ -1,0 +1,31 @@
+@startuml
+actor client as c
+participant OrderService as o
+participant WarehouseService as w
+participant BillingService as b
+participant DeliveryService as d
+participant NotifyService as n
+
+c -> o ++: create order
+o -> o: create order
+
+o -> w ++: reserve product
+w -> w: reserve product
+w -> o --: product reserved
+
+o -> b ++: process bill
+b -> b: processing bill
+b -> o --: bill approved
+
+o -> d ++: reserve courier
+d -> d: search courier
+d --> o --: courier found
+
+o --> n ++: order approved
+n -> n: send notification
+n --> o --: notification sent
+o -> c--: order created
+
+c -> o ++: get order state
+o -> c --: order state
+@enduml

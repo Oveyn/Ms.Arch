@@ -1,0 +1,30 @@
+@startuml
+actor :Администратор: as admin
+actor :Пользователь: as client
+
+usecase AccountService as as
+usecase WarehouseService as ws
+usecase ProductService as ps
+usecase BillingService as bs
+usecase OrderService as os
+usecase DeliveryService as ds
+usecase NotificationService as ns
+
+admin -> as
+admin --> as : Регистрация/Авторизация
+admin -> ws : Заведение товара на складе
+admin -> os : Просмотр заказов
+
+client--> as : Регистрация/Авторизация
+client-> bs : Пополнение/Снятие средств со счета
+client-> ps : Выбор товара
+
+client-> os : Создание/просмотр заказа
+ws ..> ps : Обновление данных о товарах
+
+os ..> ws : Резервирование товара
+os ..> bs : Оплата заказа
+os ..> ds : Резервирование курьера
+
+os ..> ns: Уведомление пользователя
+@enduml

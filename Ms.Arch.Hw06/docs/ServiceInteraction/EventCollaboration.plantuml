@@ -1,0 +1,61 @@
+@startuml
+actor client as c
+participant OrderService as o
+queue OrderBroker as obr
+
+queue WarehouseBroker as wbr
+participant WarehouseService as w
+
+queue BillingBroker as bbr
+participant BillingService as b
+
+queue DeliveryBroker as dbr
+participant DeliveryService as d
+
+queue NotifyBroker as nbr
+participant NotifyService as n
+
+c -> o ++: create order
+o -> o: create order (OrderState.created)
+o --> obr: create order
+o -> c --: order data
+
+obr --> o ++: consume
+o -> o: OrderState.process
+
+o --> wbr --: reserve product
+w <-- wbr ++: consume
+w -> w: reserve product
+w --> obr --: product reserved
+
+obr --> o ++: consume
+o -> o: OrderState.reserved
+o --> bbr -- : process bill
+bbr --> b ++: consume
+b -> b: process bill
+b --> obr --: bill approved
+
+obr --> o ++: consume
+o -> o: OrderState.paid
+
+o --> nbr: send notification order approved
+n <-- nbr ++: consume
+n -> n: send notification
+n --> obr --: notification sent
+
+o --> dbr --: reserve courier
+dbr --> d ++: consume
+d -> d: search courier
+d --> obr --: courier found
+
+obr --> o ++: consume
+o -> o: OrderState.delivery
+o --> nbr --: send notification courier found
+
+n <-- nbr ++: consume
+n -> n: send notification
+n --> obr --: notification sent
+
+c -> o ++: get order state
+o -> c --: order state
+@enduml

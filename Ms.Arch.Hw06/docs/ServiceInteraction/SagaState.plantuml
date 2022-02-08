@@ -1,0 +1,20 @@
+@startuml
+usecase "Создан" as created
+usecase "В обработке" as process
+usecase "Зарезервирован" as reserved
+usecase "Отклонен" as cancelled
+usecase "Оплачен" as paid
+usecase "Платеж отклонен" as billReject 
+usecase "Передан в доставку" as delivery
+
+created -right-> process
+
+process -right-> reserved
+process -down-> cancelled
+
+reserved -right-> paid
+billReject -left-> cancelled
+reserved -down-> billReject
+
+paid -right-> delivery
+@enduml
